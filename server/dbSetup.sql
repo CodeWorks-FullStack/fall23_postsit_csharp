@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS albums(
   category ENUM("misc", "dogs", "cats", "gachamon", "animals", "games") NOT NULL,
   archived BOOLEAN NOT NULL DEFAULT false,
   coverImg VARCHAR(1000) NOT NULL,
-  creatorId VARCHAR(255) NOT NULL,
-  FOREIGN KEY (creatorId) REFERENCES accounts(id)
+  creatorId VARCHAR(255) NOT NULL, -- data type should match the type for our accounts table id column
+  FOREIGN KEY (creatorId) REFERENCES accounts(id) -- Sets up a foreign key constraint for our creatorId. When you try to create an album, it will make sure the creatorId we are using matches one of the ids in our account table
 )default charset utf8 COMMENT '';
 
 DROP TABLE albums;
@@ -30,7 +30,7 @@ VALUES("doggy dogs", "dogs", "https://images.unsplash.com/photo-1530281700549-e8
 SELECT 
 alb.*,
 acc.* 
-FROM albums alb
-JOIN accounts acc ON alb.creatorId = acc.id
+FROM albums alb -- alb is an alias for album
+JOIN accounts acc ON alb.creatorId = acc.id -- only join account data when our on statement is true
 WHERE alb.id = 1
 ;

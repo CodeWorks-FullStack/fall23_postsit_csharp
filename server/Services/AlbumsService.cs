@@ -17,11 +17,13 @@ public class AlbumsService
   {
     Album album = GetAlbumById(albumId);
 
+    // NOTE check ownership
     if (album.CreatorId != userId)
     {
       throw new Exception("NOT YOUR ALBUM");
     }
 
+    // NOTE cannot unarchive album, so we don't call to our repo
     if (album.Archived)
     {
       return album;

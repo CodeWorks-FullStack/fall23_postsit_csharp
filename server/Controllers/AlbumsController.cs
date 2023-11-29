@@ -7,7 +7,7 @@ public class AlbumsController : ControllerBase
 {
 
   private readonly AlbumsService _albumsService;
-  private readonly Auth0Provider _auth0Provider;
+  private readonly Auth0Provider _auth0Provider; // NOTE brings in the built in auth0provider, don't forget to add this to your constructor
 
   public AlbumsController(AlbumsService albumsService, Auth0Provider auth0Provider)
   {
@@ -15,13 +15,15 @@ public class AlbumsController : ControllerBase
     _auth0Provider = auth0Provider;
   }
 
-  [Authorize]
+  [Authorize] // NOTE the below method requires a bearer token to access
   [HttpPost]
   public async Task<ActionResult<Album>> CreateAlbum([FromBody] Album albumData)
   {
     try
     {
+      // NOTE brings in information from auth0, similar to req.userInfo
       Account userInfo = await _auth0Provider.GetUserInfoAsync<Account>(HttpContext);
+      // REVIEW don't trust the user to tell us who they are
       albumData.CreatorId = userInfo.Id;
       Album album = _albumsService.CreateAlbum(albumData);
       return Ok(album);
