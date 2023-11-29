@@ -10,4 +10,5 @@ public class Album
   public bool Archived { get; set; }
   public string CoverImg { get; set; }
   public string CreatorId { get; set; }
+  public Profile Creator { get; set; }
 }

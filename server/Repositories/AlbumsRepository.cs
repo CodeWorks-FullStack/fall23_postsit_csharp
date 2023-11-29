@@ -19,12 +19,29 @@ public class AlbumsRepository
     VALUES(@Title, @Category, @CoverImg, @CreatorId);
     
     SELECT 
-    alb.*
+    alb.*,
+    acc.*
     FROM albums alb
-    JOIN accounts acc ON alb.creatorId =
-    WHERE id = LAST_INSERT_ID();";
+    JOIN accounts acc ON alb.creatorId = acc.id
+    WHERE alb.id = LAST_INSERT_ID();";
 
-    Album album = _db.Query<Album>(sql, albumData).FirstOrDefault();
+    // Album album = _db.Query<Album>(sql, albumData).FirstOrDefault();
+
+    // Album album = _db.Query<Album, Profile, Album>(sql, AlbumBuilder, albumData).FirstOrDefault();
+
+
+    Album album = _db.Query<Album, Profile, Album>(sql, (album, profile) =>
+    {
+      album.Creator = profile;
+      return album;
+    }, albumData).FirstOrDefault();
+
+    return album;
+  }
+
+  private Album AlbumBuilder(Album album, Profile profile)
+  {
+    album.Creator = profile;
     return album;
   }
 }
