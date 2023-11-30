@@ -8,11 +8,13 @@ public class AlbumsController : ControllerBase
 
   private readonly AlbumsService _albumsService;
   private readonly Auth0Provider _auth0Provider; // NOTE brings in the built in auth0provider, don't forget to add this to your constructor
+  private readonly PicturesService _picturesService;
 
-  public AlbumsController(AlbumsService albumsService, Auth0Provider auth0Provider)
+  public AlbumsController(AlbumsService albumsService, Auth0Provider auth0Provider, PicturesService picturesService)
   {
     _albumsService = albumsService;
     _auth0Provider = auth0Provider;
+    _picturesService = picturesService;
   }
 
   [Authorize] // NOTE the below method requires a bearer token to access
@@ -73,6 +75,20 @@ public class AlbumsController : ControllerBase
       string userId = userInfo.Id;
       Album album = _albumsService.ArchiveAlbum(albumId, userId);
       return Ok(album);
+    }
+    catch (Exception e)
+    {
+      return BadRequest(e.Message);
+    }
+  }
+
+  [HttpGet("{albumId}/pictures")]
+  public ActionResult<List<Picture>> GetPicturesByAlbumId(int albumId)
+  {
+    try
+    {
+      List<Picture> pictures = _picturesService.GetPicturesByAlbumId(albumId);
+      return Ok(pictures);
     }
     catch (Exception e)
     {

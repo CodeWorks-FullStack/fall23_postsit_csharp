@@ -1,4 +1,5 @@
 
+
 namespace postit_csharp.Repositories;
 
 public class PicturesRepository
@@ -18,9 +19,37 @@ public class PicturesRepository
       pictures(imgUrl, albumId, creatorId)
       VALUES(@ImgUrl, @AlbumId, @CreatorId);
       
-      SELECT * FROM pictures WHERE id = LAST_INSERT_ID();";
+      SELECT 
+      pic.*,
+      acc.* 
+      FROM pictures pic
+      JOIN accounts acc ON acc.id = pic.creatorId
+      WHERE pic.id = LAST_INSERT_ID();";
 
-    Picture picture = _db.Query<Picture>(sql, pictureData).FirstOrDefault();
+    Picture picture = _db.Query<Picture, Profile, Picture>(sql, (picture, profile) =>
+    {
+      picture.Creator = profile;
+      return picture;
+    }, pictureData).FirstOrDefault();
     return picture;
+  }
+
+  internal List<Picture> GetPicturesByAlbumId(int albumId)
+  {
+    string sql = @"
+    SELECT
+    pic.*,
+    acc.*
+    FROM pictures pic
+    JOIN accounts acc ON acc.id = pic.creatorId 
+    WHERE pic.albumId = @albumId;";
+
+    List<Picture> pictures = _db.Query<Picture, Profile, Picture>(sql, (picture, profile) =>
+    {
+      picture.Creator = profile;
+      return picture;
+    }, new { albumId }).ToList();
+
+    return pictures;
   }
 }
