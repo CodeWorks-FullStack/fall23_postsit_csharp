@@ -1,5 +1,8 @@
 
 
+
+
+
 namespace postit_csharp.Repositories;
 
 public class CollaboratorsRepository
@@ -25,13 +28,61 @@ public class CollaboratorsRepository
     return collaborator;
   }
 
-  internal List<Collaborator> GetCollaboratorsByAlbumId(int albumId)
+  internal void DestroyCollaborator(int collaboratorId)
+  {
+    string sql = "DELETE FROM collaborators WHERE id = @collaboratorId LIMIT 1;";
+    _db.Execute(sql, new { collaboratorId });
+  }
+
+  internal List<AlbumCollaboration> GetAlbumCollaborationsByAccountId(string userId)
   {
     string sql = @"
-    SELECT * FROM collaborators WHERE albumId = @albumId
-    ;";
+    SELECT
+    collab.*,
+    alb.*,
+    acc.*
+    FROM collaborators collab
+    JOIN albums alb ON collab.albumId = alb.id
+    JOIN accounts acc ON acc.id = alb.creatorId
+    WHERE collab.accountId = @userId;";
 
-    List<Collaborator> collaborators = _db.Query<Collaborator>(sql, new { albumId }).ToList();
+    List<AlbumCollaboration> albumCollaborations = _db.Query<Collaborator, AlbumCollaboration, Profile, AlbumCollaboration>
+    (sql, (collaborator, albumCollaboration, profile) =>
+    {
+      albumCollaboration.CollaborationId = collaborator.Id;
+      albumCollaboration.AccountId = collaborator.AccountId;
+      albumCollaboration.Creator = profile;
+      return albumCollaboration;
+    }, new { userId }).ToList();
+    return albumCollaborations;
+  }
+
+  internal Collaborator GetCollaboratorById(int collaboratorId)
+  {
+    string sql = "SELECT * FROM collaborators WHERE id = @collaboratorId;";
+
+    Collaborator collaborator = _db.Query<Collaborator>(sql, new { collaboratorId }).FirstOrDefault();
+    return collaborator;
+  }
+
+  internal List<ProfileCollaboration> GetCollaboratorsByAlbumId(int albumId)
+  {
+    string sql = @"
+    SELECT 
+    collab.*,
+    acc.*
+    FROM collaborators collab 
+    JOIN accounts acc ON acc.id = collab.accountId
+    WHERE collab.albumId = @albumId;";
+
+    List<ProfileCollaboration> collaborators = _db.Query<Collaborator, ProfileCollaboration, ProfileCollaboration>
+    (sql, (collaborator, profileCollab) =>
+    {
+      profileCollab.CollaborationId = collaborator.Id;
+      profileCollab.AlbumId = collaborator.AlbumId;
+      return profileCollab;
+    },
+     new { albumId }).ToList();
     return collaborators;
   }
 }

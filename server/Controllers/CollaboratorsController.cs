@@ -30,4 +30,21 @@ public class CollaboratorsController : ControllerBase
       return BadRequest(e.Message);
     }
   }
+
+  [Authorize]
+  [HttpDelete("{collaboratorId}")]
+  public async Task<ActionResult<string>> DestroyCollaborator(int collaboratorId)
+  {
+    try
+    {
+      Account userInfo = await _auth0Provider.GetUserInfoAsync<Account>(HttpContext);
+      string userId = userInfo.Id;
+      string message = _collaboratorsService.DestroyCollaborator(collaboratorId, userId);
+      return Ok(message);
+    }
+    catch (Exception e)
+    {
+      return BadRequest(e.Message);
+    }
+  }
 }

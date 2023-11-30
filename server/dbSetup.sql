@@ -62,4 +62,11 @@ CREATE TABLE collaborators(
 
 DROP TABLE collaborators;
 
-INSERT INTO collaborators(albumId, accountId) VALUES(1,'65677a22619a399a33aeef33')
+INSERT INTO collaborators(albumId, accountId) VALUES(1,'65677a22619a399a33aeef33');
+
+SELECT 
+collab.*,
+acc.* 
+FROM collaborators collab
+JOIN accounts acc ON acc.id = collab.accountId 
+WHERE collab.albumId = 1;
