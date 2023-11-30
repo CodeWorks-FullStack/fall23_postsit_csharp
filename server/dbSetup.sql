@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS albums(
   archived BOOLEAN NOT NULL DEFAULT false,
   coverImg VARCHAR(1000) NOT NULL,
   creatorId VARCHAR(255) NOT NULL, -- data type should match the type for our accounts table id column
-  FOREIGN KEY (creatorId) REFERENCES accounts(id) -- Sets up a foreign key constraint for our creatorId. When you try to create an album, it will make sure the creatorId we are using matches one of the ids in our account table
+  FOREIGN KEY (creatorId) REFERENCES accounts(id) ON DELETE CASCADE -- Sets up a foreign key constraint for our creatorId. When you try to create an album, it will make sure the creatorId we are using matches one of the ids in our account table
 )default charset utf8 COMMENT '';
 
 DROP TABLE albums;
@@ -34,3 +34,17 @@ FROM albums alb -- alb is an alias for album
 JOIN accounts acc ON alb.creatorId = acc.id -- only join account data when our on statement is true
 WHERE alb.id = 1
 ;
+
+
+
+CREATE TABLE IF NOT EXISTS pictures(
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Time Created',
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last Update',
+  imgUrl VARCHAR(1000) NOT NULL,
+  albumId INT NOT NULL,
+  creatorId VARCHAR(255) NOT NULL,
+  FOREIGN KEY(albumId) REFERENCES albums(id) ON DELETE CASCADE,
+  FOREIGN KEY(creatorId) REFERENCES accounts(id) ON DELETE CASCADE
+)default charset utf8 COMMENT '';
+
