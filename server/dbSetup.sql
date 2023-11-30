@@ -48,3 +48,18 @@ CREATE TABLE IF NOT EXISTS pictures(
   FOREIGN KEY(creatorId) REFERENCES accounts(id) ON DELETE CASCADE
 )default charset utf8 COMMENT '';
 
+CREATE TABLE collaborators(
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Time Created',
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last Update',
+  albumId INT NOT NULL,
+  accountId VARCHAR(255) NOT NULL,
+  FOREIGN KEY (albumId) REFERENCES albums(id) ON DELETE CASCADE,
+  FOREIGN KEY (accountId) REFERENCES accounts(id) ON DELETE CASCADE,
+  -- CREATE UNIQUE CONSTRAINT
+  UNIQUE(albumId, accountId)
+)default charset utf8 COMMENT '';
+
+DROP TABLE collaborators;
+
+INSERT INTO collaborators(albumId, accountId) VALUES(1,'65677a22619a399a33aeef33')

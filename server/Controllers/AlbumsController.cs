@@ -6,15 +6,17 @@ namespace postit_csharp.Controllers;
 public class AlbumsController : ControllerBase
 {
 
-  private readonly AlbumsService _albumsService;
   private readonly Auth0Provider _auth0Provider; // NOTE brings in the built in auth0provider, don't forget to add this to your constructor
+  private readonly AlbumsService _albumsService;
   private readonly PicturesService _picturesService;
+  private readonly CollaboratorsService _collaboratorsService;
 
-  public AlbumsController(AlbumsService albumsService, Auth0Provider auth0Provider, PicturesService picturesService)
+  public AlbumsController(AlbumsService albumsService, Auth0Provider auth0Provider, PicturesService picturesService, CollaboratorsService collaboratorsService)
   {
     _albumsService = albumsService;
     _auth0Provider = auth0Provider;
     _picturesService = picturesService;
+    _collaboratorsService = collaboratorsService;
   }
 
   [Authorize] // NOTE the below method requires a bearer token to access
@@ -89,6 +91,20 @@ public class AlbumsController : ControllerBase
     {
       List<Picture> pictures = _picturesService.GetPicturesByAlbumId(albumId);
       return Ok(pictures);
+    }
+    catch (Exception e)
+    {
+      return BadRequest(e.Message);
+    }
+  }
+
+  [HttpGet("{albumId}/collaborators")]
+  public ActionResult<List<Collaborator>> GetCollaboratorsByAlbumId(int albumId)
+  {
+    try
+    {
+      List<Collaborator> collaborators = _collaboratorsService.GetCollaboratorsByAlbumId(albumId);
+      return Ok(collaborators);
     }
     catch (Exception e)
     {

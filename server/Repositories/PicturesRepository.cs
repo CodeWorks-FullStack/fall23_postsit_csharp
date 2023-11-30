@@ -1,5 +1,7 @@
 
 
+
+
 namespace postit_csharp.Repositories;
 
 public class PicturesRepository
@@ -31,6 +33,31 @@ public class PicturesRepository
       picture.Creator = profile;
       return picture;
     }, pictureData).FirstOrDefault();
+    return picture;
+  }
+
+  internal void DestroyPicture(int pictureId)
+  {
+    string sql = "DELETE FROM pictures WHERE id = @pictureId LIMIT 1;";
+
+    _db.Execute(sql, new { pictureId });
+  }
+
+  internal Picture GetPictureById(int pictureId)
+  {
+    string sql = @"
+    SELECT 
+    pic.*,
+    acc.* 
+    FROM pictures pic
+    JOIN accounts acc ON acc.id = pic.creatorId 
+    WHERE pic.id = @pictureId;";
+
+    Picture picture = _db.Query<Picture, Profile, Picture>(sql, (picture, profile) =>
+    {
+      picture.Creator = profile;
+      return picture;
+    }, new { pictureId }).FirstOrDefault();
     return picture;
   }
 
